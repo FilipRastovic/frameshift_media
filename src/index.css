@@ -774,6 +774,17 @@ section { padding: 7rem 5vw; }
 .cta-input:focus { border-color: var(--red); }
 .cta-input::placeholder { color: var(--text-subtle); }
 
+.cta-success {
+  max-width: 460px;
+  margin: 0 auto;
+  padding: 1rem 1.5rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-red);
+  border-radius: 4px;
+  color: var(--text);
+  font-size: 0.9rem;
+}
+
 /* ── FOOTER ── */
 footer {
   background: var(--bg-2);

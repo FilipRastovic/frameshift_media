@@ -1,4 +1,31 @@
+import { useCallback, useRef, useState } from 'react'
+
+const CONTACT_EMAIL = 'srdjan.rdn@gmail.com'
+
 export default function App() {
+  const [submitted, setSubmitted] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
+  const mountedAt = useRef(Date.now())
+
+  const handleSubmit = useCallback(async (e) => {
+    e.preventDefault()
+    const honeypot = e.target.querySelector('input[name="website"]')
+    if (honeypot?.value) return
+    if (Date.now() - mountedAt.current < 2000) return
+    setSubmitting(true)
+    try {
+      const formData = new FormData(e.target)
+      await fetch(`https://formsubmit.co/ajax/${CONTACT_EMAIL}`, {
+        method: 'POST',
+        body: formData,
+      })
+      setSubmitted(true)
+    } catch {
+      setSubmitted(true)
+    }
+    setSubmitting(false)
+  }, [])
+
   return (
     <>
       {/* NAV */}
@@ -361,10 +388,25 @@ export default function App() {
           <p className="section-sub">
             Ostavite vaš broj ili email — javimo se u roku od 24 sata za besplatnu konsultaciju bez obaveza.
           </p>
-          <form className="cta-form" onSubmit={(e) => e.preventDefault()}>
-            <input className="cta-input" type="text" placeholder="Vaš broj telefona ili email" />
-            <a href="#" className="btn-primary" style={{ whiteSpace: 'nowrap' }}>Pošaljite →</a>
-          </form>
+          {submitted ? (
+            <div className="cta-success">
+              <p>Hvala! Javićemo se u roku od 24 sata.</p>
+            </div>
+          ) : (
+            <form className="cta-form" onSubmit={handleSubmit}>
+              <input type="hidden" name="_subject" value="Novi upit — FrameShift Media" />
+              <input type="hidden" name="_captcha" value="false" />
+              <input type="hidden" name="_template" value="table" />
+              <div style={{ position: 'absolute', width: '1px', height: '1px', overflow: 'hidden', clipPath: 'inset(50%)', opacity: 0, pointerEvents: 'none' }} aria-hidden="true">
+                <label htmlFor="cta-website-hp">Website</label>
+                <input type="text" id="cta-website-hp" name="website" tabIndex={-1} autoComplete="off" />
+              </div>
+              <input className="cta-input" type="text" name="contact" placeholder="Vaš broj telefona ili email" required />
+              <button type="submit" className="btn-primary" style={{ whiteSpace: 'nowrap', border: 'none', cursor: 'pointer' }} disabled={submitting}>
+                {submitting ? 'Slanje...' : 'Pošaljite →'}
+              </button>
+            </form>
+          )}
           <p style={{ fontSize: '0.75rem', color: 'var(--text-subtle)', marginTop: '1rem' }}>Bez spam-a. Javimo se isključivo zbog dogovaranja konsultacije.</p>
         </div>
       </section>
